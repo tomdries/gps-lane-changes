@@ -1,6 +1,4 @@
 ## added by Tom
-config.py
-flitsmeister data gitignore/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
