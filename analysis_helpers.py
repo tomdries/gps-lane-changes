@@ -11,7 +11,7 @@ def plot_lane_changes(lca_df, left_color='C0', right_color='C1'):
 def derivative(t, y):
     dy = np.diff(y, prepend=np.nan)
     dt = np.diff(t,prepend=np.nan)
-    dt = np.where(dt==0, np.nan, dt)
+    dt =    np.where(dt==0, np.nan, dt)
     dydt = dy/dt
 
  
@@ -47,22 +47,23 @@ def calculate_signals_trip(trip_df, params):
     trip_df['proj_lat_dist_ewmfilt'] = np.sin(trip_df.bearing_diff_ewmfilt) * trip_df.distance_gps
     trip_df['proj_lat_vel_ewmfilt'] = derivative(trip_df.t,trip_df.proj_lat_dist_ewmfilt)
 
-    trip_df['offset_medfilt2'] = trip_df.offset.rolling(2).median()
-    trip_df['lat_vel_medfilt2'] = derivative(trip_df.t, trip_df['offset_medfilt2'])
-
-    trip_df['offset_medfilt3'] = trip_df.offset.rolling(3).median()
-    trip_df['lat_vel_medfilt3'] = derivative(trip_df.t, trip_df['offset_medfilt3'])
-
-    trip_df['bearing_diff_medfilt2'] = trip_df.bearing_diff.rolling(3).median()
-    trip_df['proj_lat_dist_medfilt2'] = np.sin(trip_df.bearing_diff_medfilt2) * trip_df.distance_gps
-
-    trip_df['bearing_diff_medfilt3'] = trip_df.bearing_diff.rolling(3).median()
-    trip_df['proj_lat_dist_medfilt3'] = np.sin(trip_df.bearing_diff_medfilt3) * trip_df.distance_gps
+    trip_df['offset_medfilt'] = trip_df.offset.rolling(params['MEDFILT_SIZE']).median()
+    trip_df['lat_vel_medfilt'] = derivative(trip_df.t, trip_df['offset_medfilt'])
 
     trip_df['bearing_diff_medfilt'] = trip_df.bearing_diff.rolling(params['MEDFILT_SIZE']).median()
     trip_df['proj_lat_dist_medfilt'] = np.sin(trip_df.bearing_diff_medfilt) * trip_df.distance_gps
     
     trip_df['proj_lat_dist_medfilt_rollingsum'] = trip_df.proj_lat_dist_medfilt.rolling(params['PROJ_DIST_ROLLINGSUM']).sum()
+
+    # lookback offset
+    for col in ['offset', 'offset_ewmfilt']:
+        lookback_offset = [np.nan]*len(trip_df)
+        for i in range(len(trip_df)-params['LOOKBACK_DISTDIFF']):
+            under = trip_df[col].iloc[i]
+            upper = trip_df[col].iloc[i+params['LOOKBACK_DISTDIFF']]
+            lookback_offset[i+params['LOOKBACK_DISTDIFF']]=upper-under
+        trip_df[f'lookback_{col}'] = lookback_offset
+
     return trip_df
 
 def calculate_signals_alltrips(trip_dfs, params):
@@ -120,4 +121,12 @@ def plot_fragments(fragment_dfs, plot_col, params):
 
 
     plt.tight_layout() 
+
+
+def precision_recall_f1(TP, FN, FP): 
+    precision = TP/(TP+FP) # positive predictive value, how many detections are relevant
+    recall = TP/(TP+FN) # hit rate
+    f1 = 2*TP / (2*TP + FP + FN)
+    return precision, recall, f1
+
 
