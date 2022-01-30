@@ -53,7 +53,6 @@ def calculate_signals_trip(trip_df, params):
     trip_df['bearing_diff_medfilt'] = trip_df.bearing_diff.rolling(params['MEDFILT_SIZE']).median()
     trip_df['proj_lat_dist_medfilt'] = np.sin(trip_df.bearing_diff_medfilt) * trip_df.distance_gps
     
-    trip_df['proj_lat_dist_medfilt_rollingsum'] = trip_df.proj_lat_dist_medfilt.rolling(params['PROJ_DIST_ROLLINGSUM']).sum()
 
     # lookback offset
     for col in ['offset', 'offset_ewmfilt']:
@@ -74,7 +73,7 @@ def calculate_signals_alltrips(trip_dfs, params):
     return trip_dfs
     
 
-def extract_lanechange_fragments_trip(trip_df, lca_df, window_size):
+def extract_lanechange_fragments_trip(signal_col, trip_df, lca_df, window_size):
     lca_df['t0_w'] = lca_df.t_lc-(window_size/2) # boundaries for all windows
     lca_df['t_end_w'] = lca_df.t_lc+(window_size/2)
 
@@ -84,21 +83,23 @@ def extract_lanechange_fragments_trip(trip_df, lca_df, window_size):
         if lca_df_row.direction == 'left':
             fragment_df = trip_df[trip_df.t.between(lca_df_row.t0_w, lca_df_row.t_end_w)].copy()
             fragment_df['t_fragment'] = fragment_df.t - lca_df_row.t_lc
+            fragment_df['relative_signal'] = fragment_df[signal_col] - fragment_df.loc[abs(fragment_df.t_fragment).idxmin(), signal_col]
             fragment_dfs[0].append(fragment_df)
 
         elif lca_df_row.direction == 'right':
             fragment_df = trip_df[trip_df.t.between(lca_df_row.t0_w, lca_df_row.t_end_w)].copy()
             fragment_df['t_fragment'] = fragment_df.t - lca_df_row.t_lc
+            fragment_df['relative_signal'] = fragment_df[signal_col] - fragment_df.loc[abs(fragment_df.t_fragment).idxmin(), signal_col]
             fragment_dfs[1].append(fragment_df)
     return fragment_dfs
 
 
-def extract_lanechange_fragments_alltrips(trip_dfs, trip_names, lca_dfs, dev_nr, sections, window_size):
+def extract_lanechange_fragments_alltrips(signal_col, trip_dfs, trip_names, lca_dfs, dev_nr, sections, window_size):
     fragments_all_trips = [[],[]]
 
     for trip_nr in range(3):
         trip_df, lca_df, trip_name = selector(trip_dfs, lca_dfs, trip_names, trip_nr, dev_nr, sections)
-        fragment_dfs = extract_lanechange_fragments_trip(trip_df, lca_df, window_size=window_size)
+        fragment_dfs = extract_lanechange_fragments_trip(signal_col, trip_df, lca_df, window_size=window_size)
         fragments_all_trips[0].extend(fragment_dfs[0])
         fragments_all_trips[1].extend(fragment_dfs[1])
     return fragments_all_trips
@@ -118,7 +119,61 @@ def plot_fragments(fragment_dfs, plot_col, params):
     axs[0].title.set_text('left')
     axs[1].title.set_text('right')
     axs[0].set_ylabel(params['ylabel'])
+    
+    n_left = len(fragment_dfs[0])
+    n_right = len(fragment_dfs[1])
 
+    axs[0].text(-4,-2, f"n={n_left}", size=15)
+    axs[1].text(-4,1.5, f"n={n_right}", size=15)
+
+    plt.tight_layout() 
+
+def plot_fragments_offset(fragment_dfs, plot_col, params):
+    fig, axs = plt.subplots(1,2, figsize=(8,2), sharey=True)
+    
+    for fragment_df in fragment_dfs[0]: #left
+        axs[0].plot(fragment_df.t_fragment, fragment_df[plot_col], color='black', alpha=params['alpha'])
+    for fragment_df in fragment_dfs[1]: #right
+        axs[1].plot(fragment_df.t_fragment, fragment_df[plot_col], color='black', alpha=params['alpha'])
+        
+    if params['ylims']: 
+        axs[0].set_ylim(params['ylims'][0], params['ylims'][1])
+        axs[1].set_ylim(params['ylims'][0], params['ylims'][1])
+    axs[0].title.set_text('left')
+    axs[1].title.set_text('right')
+    axs[0].set_ylabel(params['ylabel'])
+    
+    n_left = len(fragment_dfs[0])
+    n_right = len(fragment_dfs[1])
+
+    axs[0].text(-4,-2, f"n={n_left}", size=15)
+    axs[1].text(-4,1.5, f"n={n_right}", size=15)
+
+    plt.tight_layout() 
+
+
+def plot_fragments_offset_with_baseline(fragment_dfs,fragment_dfs_baseline, plot_col, params):
+    fig, axs = plt.subplots(1,3, figsize=(8,2), sharey=True)
+    
+    for fragment_df in fragment_dfs[0]: #left
+        axs[0].plot(fragment_df.t_fragment, fragment_df[plot_col], color='black', alpha=params['alpha'])
+    for fragment_df in fragment_dfs[1]: #right
+        axs[1].plot(fragment_df.t_fragment, fragment_df[plot_col], color='black', alpha=params['alpha'])
+    for fragment_df in fragment_dfs_baseline:
+        axs[2].plot(fragment_df.t_fragment, fragment_df[plot_col], color='black', alpha=params['alpha'])
+
+    if params['ylims']: 
+        axs[0].set_ylim(params['ylims'][0], params['ylims'][1])
+        axs[1].set_ylim(params['ylims'][0], params['ylims'][1])
+    axs[0].title.set_text('left')
+    axs[1].title.set_text('right')
+    axs[0].set_ylabel(params['ylabel'])
+    
+    n_left = len(fragment_dfs[0])
+    n_right = len(fragment_dfs[1])
+
+    axs[0].text(-4,-2, f"n={n_left}", size=15)
+    axs[1].text(-4,1.5, f"n={n_right}", size=15)
 
     plt.tight_layout() 
 

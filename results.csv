@@ -1,0 +1,41 @@
+trip_nr,dev_nr,sections,trip_name,signal_name,EWM_SPAN,LOOKBACK_DISTDIFF,LANE_CHANGE_DURATION,ROLLING_SUM_SIZE,CUTOFF_THRESHOLD,precision,recall,f1,timestamp
+2,1,all,03 GPS GoPro downsampled (last).csv,lookback_offset_ewmfilt,3,5,8,1,2.8,0.679245283,0.455696203,0.545454545,1/30/2022 15:29
+2,1,all,03 GPS GoPro downsampled (last).csv,lookback_offset_ewmfilt,3,5,8,1,2.6,0.724137931,0.53164557,0.613138686,1/30/2022 15:29
+2,1,all,03 GPS GoPro downsampled (last).csv,lookback_offset_ewmfilt,3,5,8,1,2.4,0.736842105,0.717948718,0.727272727,1/30/2022 15:29
+2,1,all,03 GPS GoPro downsampled (last).csv,lookback_offset_ewmfilt,3,5,8,1,2.2,0.729411765,0.784810127,0.756097561,1/30/2022 15:29
+2,1,all,03 GPS GoPro downsampled (last).csv,lookback_offset_ewmfilt,3,5,8,1,2,0.712643678,0.794871795,0.751515152,1/30/2022 15:29
+2,1,all,03 GPS GoPro downsampled (last).csv,lookback_offset_ewmfilt,3,5,8,1,1.8,0.690721649,0.848101266,0.761363636,1/30/2022 15:29
+2,1,all,03 GPS GoPro downsampled (last).csv,lookback_offset_ewmfilt,3,5,8,1,1.6,0.666666667,0.911392405,0.770053476,1/30/2022 15:29
+2,1,all,03 GPS GoPro downsampled (last).csv,lookback_offset_ewmfilt,3,5,8,1,1.4,0.644067797,0.962025316,0.771573604,1/30/2022 15:29
+2,1,all,03 GPS GoPro downsampled (last).csv,lookback_offset,3,5,8,1,2.8,0.686746988,0.730769231,0.708074534,1/30/2022 15:27
+2,1,all,03 GPS GoPro downsampled (last).csv,lookback_offset,3,5,8,1,2.6,0.673913043,0.794871795,0.729411765,1/30/2022 15:27
+2,1,all,03 GPS GoPro downsampled (last).csv,lookback_offset,3,5,8,1,2.4,0.63,0.807692308,0.707865169,1/30/2022 15:27
+2,1,all,03 GPS GoPro downsampled (last).csv,lookback_offset,3,5,8,1,2.2,0.625,0.833333333,0.714285714,1/30/2022 15:27
+2,1,all,03 GPS GoPro downsampled (last).csv,lookback_offset,3,5,8,1,2,0.631578947,0.911392405,0.74611399,1/30/2022 15:27
+2,1,all,03 GPS GoPro downsampled (last).csv,lookback_offset,3,5,8,1,1.8,0.589147287,0.962025316,0.730769231,1/30/2022 15:27
+2,1,all,03 GPS GoPro downsampled (last).csv,lookback_offset,3,5,8,1,1.6,0.531468531,0.974358974,0.687782805,1/30/2022 15:27
+2,1,all,03 GPS GoPro downsampled (last).csv,lookback_offset,3,5,8,1,1.4,0.48125,0.974683544,0.644351464,1/30/2022 15:27
+2,1,all,03 GPS GoPro downsampled (last).csv,lookback_offset,3,5,8,1,2.8,0.686746988,0.730769231,0.708074534,1/30/2022 15:27
+2,1,all,03 GPS GoPro downsampled (last).csv,lookback_offset,3,5,8,1,2.6,0.673913043,0.794871795,0.729411765,1/30/2022 15:27
+2,1,all,03 GPS GoPro downsampled (last).csv,lookback_offset,3,5,8,1,2.4,0.63,0.807692308,0.707865169,1/30/2022 15:27
+2,1,all,03 GPS GoPro downsampled (last).csv,lookback_offset,3,5,8,1,2.2,0.625,0.833333333,0.714285714,1/30/2022 15:27
+2,1,all,03 GPS GoPro downsampled (last).csv,lookback_offset,3,5,8,1,2,0.631578947,0.911392405,0.74611399,1/30/2022 15:27
+2,1,all,03 GPS GoPro downsampled (last).csv,lookback_offset,3,5,8,1,1.8,0.589147287,0.962025316,0.730769231,1/30/2022 15:27
+2,1,all,03 GPS GoPro downsampled (last).csv,lookback_offset,3,5,8,1,1.6,0.531468531,0.974358974,0.687782805,1/30/2022 15:27
+2,1,all,03 GPS GoPro downsampled (last).csv,lookback_offset,3,5,8,1,1.4,0.48125,0.974683544,0.644351464,1/30/2022 15:27
+2,1,"['A', 'M']",03 GPS GoPro downsampled (last).csv,lookback_offset,3,5,8,1,2.8,0.9375,0.714285714,0.810810811,1/30/2022 15:20
+2,1,"['A', 'M']",03 GPS GoPro downsampled (last).csv,lookback_offset,3,5,8,1,2.6,0.941176471,0.761904762,0.842105263,1/30/2022 15:20
+2,1,"['A', 'M']",03 GPS GoPro downsampled (last).csv,lookback_offset,3,5,8,1,2.4,0.941176471,0.761904762,0.842105263,1/30/2022 15:20
+2,1,"['A', 'M']",03 GPS GoPro downsampled (last).csv,lookback_offset,3,5,8,1,2.2,0.888888889,0.761904762,0.820512821,1/30/2022 15:20
+2,1,"['A', 'M']",03 GPS GoPro downsampled (last).csv,lookback_offset,3,5,8,1,2,0.863636364,0.904761905,0.88372093,1/30/2022 15:20
+2,1,"['A', 'M']",03 GPS GoPro downsampled (last).csv,lookback_offset,3,5,8,1,1.8,0.807692308,1,0.893617021,1/30/2022 15:20
+2,1,"['A', 'M']",03 GPS GoPro downsampled (last).csv,lookback_offset,3,5,8,1,1.6,0.689655172,0.952380952,0.8,1/30/2022 15:20
+2,1,"['A', 'M']",03 GPS GoPro downsampled (last).csv,lookback_offset,3,5,8,1,1.4,0.689655172,0.952380952,0.8,1/30/2022 15:20
+2,1,"['A', 'M']",03 GPS GoPro downsampled (last).csv,lookback_offset_ewmfilt,3,5,8,1,2.8,0.8,0.380952381,0.516129032,1/30/2022 15:08
+2,1,"['A', 'M']",03 GPS GoPro downsampled (last).csv,lookback_offset_ewmfilt,3,5,8,1,2.6,0.909090909,0.476190476,0.625,1/30/2022 15:08
+2,1,"['A', 'M']",03 GPS GoPro downsampled (last).csv,lookback_offset_ewmfilt,3,5,8,1,2.4,0.941176471,0.761904762,0.842105263,1/30/2022 15:08
+2,1,"['A', 'M']",03 GPS GoPro downsampled (last).csv,lookback_offset_ewmfilt,3,5,8,1,2.2,0.941176471,0.761904762,0.842105263,1/30/2022 15:08
+2,1,"['A', 'M']",03 GPS GoPro downsampled (last).csv,lookback_offset_ewmfilt,3,5,8,1,2,0.9375,0.714285714,0.810810811,1/30/2022 15:08
+2,1,"['A', 'M']",03 GPS GoPro downsampled (last).csv,lookback_offset_ewmfilt,3,5,8,1,1.8,0.941176471,0.761904762,0.842105263,1/30/2022 15:08
+2,1,"['A', 'M']",03 GPS GoPro downsampled (last).csv,lookback_offset_ewmfilt,3,5,8,1,1.6,0.863636364,0.904761905,0.88372093,1/30/2022 15:08
+2,1,"['A', 'M']",03 GPS GoPro downsampled (last).csv,lookback_offset_ewmfilt,3,5,8,1,1.4,0.769230769,0.952380952,0.85106383,1/30/2022 15:08
