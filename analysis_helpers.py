@@ -82,13 +82,13 @@ def extract_lanechange_fragments_trip(signal_col, trip_df, lca_df, window_size):
     for i, lca_df_row in lca_df.iterrows(): # for lane changes in lca_df
         if lca_df_row.direction == 'left':
             fragment_df = trip_df[trip_df.t.between(lca_df_row.t0_w, lca_df_row.t_end_w)].copy()
-            fragment_df['t_fragment'] = fragment_df.t - lca_df_row.t_lc
+            fragment_df['t_fragment'] = fragment_df.t - (fragment_df.t.iloc[0] + fragment_df.t.iloc[-1])/2 # lca_df_row.t_lc
             fragment_df['relative_signal'] = fragment_df[signal_col] - fragment_df.loc[abs(fragment_df.t_fragment).idxmin(), signal_col]
             fragment_dfs[0].append(fragment_df)
 
         elif lca_df_row.direction == 'right':
             fragment_df = trip_df[trip_df.t.between(lca_df_row.t0_w, lca_df_row.t_end_w)].copy()
-            fragment_df['t_fragment'] = fragment_df.t - lca_df_row.t_lc
+            fragment_df['t_fragment'] = fragment_df.t - (fragment_df.t.iloc[0] + fragment_df.t.iloc[-1])/2# lca_df_row.t_lc
             fragment_df['relative_signal'] = fragment_df[signal_col] - fragment_df.loc[abs(fragment_df.t_fragment).idxmin(), signal_col]
             fragment_dfs[1].append(fragment_df)
     return fragment_dfs
@@ -139,6 +139,11 @@ def plot_fragments_offset(fragment_dfs, plot_col, params):
     if params['ylims']: 
         axs[0].set_ylim(params['ylims'][0], params['ylims'][1])
         axs[1].set_ylim(params['ylims'][0], params['ylims'][1])
+        axs[2].set_ylim(params['ylims'][0], params['ylims'][1])
+    if params['xlims']:
+        axs[0].set_xlim(params['xlims'][0], params['xlims'][1])
+        axs[1].set_xlim(params['xlims'][0], params['xlims'][1])
+        axs[2].set_xlim(params['xlims'][0], params['xlims'][1])
     axs[0].title.set_text('left')
     axs[1].title.set_text('right')
     axs[0].set_ylabel(params['ylabel'])
@@ -165,17 +170,25 @@ def plot_fragments_offset_with_baseline(fragment_dfs,fragment_dfs_baseline, plot
     if params['ylims']: 
         axs[0].set_ylim(params['ylims'][0], params['ylims'][1])
         axs[1].set_ylim(params['ylims'][0], params['ylims'][1])
-    axs[0].title.set_text('left')
-    axs[1].title.set_text('right')
-    axs[0].set_ylabel(params['ylabel'])
+        axs[2].set_ylim(params['ylims'][0], params['ylims'][1])
+    if params['xlims']:
+        axs[0].set_xlim(params['xlims'][0], params['xlims'][1])
+        axs[1].set_xlim(params['xlims'][0], params['xlims'][1])
+        axs[2].set_xlim(params['xlims'][0], params['xlims'][1])
+    axs[0].title.set_text('left lane change')
+    axs[1].title.set_text('right lane change')
+    axs[2].title.set_text('no lane change')
+    axs[0].set_ylabel(params['ylabel'],size=11)
+    axs[1].set_xlabel(params['xlabel'],size=12)
+    
     
     n_left = len(fragment_dfs[0])
     n_right = len(fragment_dfs[1])
     n_baseline = len(fragment_dfs_baseline)
 
-    axs[0].text(-4,-2, f"n={n_left}", size=15)
-    axs[1].text(-4,1.5, f"n={n_right}", size=15)
-    axs[2].text(-4,1.5, f"n={n_baseline}", size=15)
+    axs[0].text(-1.2,2.5, f"n={n_left}", size=13)
+    axs[1].text(-1.2,2.5, f"n={n_right}", size=13)
+    axs[2].text(-1.2,2.5, f"n={n_baseline}", size=13)
     plt.tight_layout() 
 
 
