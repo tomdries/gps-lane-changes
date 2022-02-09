@@ -171,10 +171,11 @@ def plot_fragments_offset_with_baseline(fragment_dfs,fragment_dfs_baseline, plot
     
     n_left = len(fragment_dfs[0])
     n_right = len(fragment_dfs[1])
+    n_baseline = len(fragment_dfs_baseline)
 
     axs[0].text(-4,-2, f"n={n_left}", size=15)
     axs[1].text(-4,1.5, f"n={n_right}", size=15)
-
+    axs[2].text(-4,1.5, f"n={n_baseline}", size=15)
     plt.tight_layout() 
 
 
