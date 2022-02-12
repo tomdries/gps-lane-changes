@@ -73,6 +73,60 @@ def calculate_signals_alltrips(trip_dfs, params):
     return trip_dfs
     
 
+def extract_baseline_fragments_trip(signal_col, trip_df, lca_df, window_size, min_dist):
+    
+    t_start_lc = lca_df.t_lc - min_dist 
+    t_end_lc = lca_df.t_lc + min_dist 
+
+    # What are intervals without lane change annotations
+    intervals_without_lane_change = [(trip_df.t.iloc[0], t_start_lc.iloc[0])]
+    for i in range(len(lca_df)-1):
+        intervals_without_lane_change.append((t_end_lc.iloc[i], t_start_lc.iloc[i+1]))
+    intervals_without_lane_change.append((t_end_lc.iloc[-1], trip_df.t.iloc[-1]))
+
+    # Remove intervals that last shorter than window_size
+    intervals_without_lane_change = [x for x in intervals_without_lane_change if x[1]-x[0]>window_size]
+
+    # split the intervals up in non-overlapping fragments of size window_size
+    fragments_without_lane_change = []
+    for interval in intervals_without_lane_change:
+        interval_duration = interval[1] - interval[0]
+        fragment_bounds = np.arange(interval[0], interval[1], window_size)
+        for i in range(len(fragment_bounds) - 1):
+            fragments_without_lane_change.append((fragment_bounds[i], fragment_bounds[i+1]))
+    
+    
+    # remove fragments that contain no data
+    t_fragments = fragments_without_lane_change
+    for i, t_fragment in enumerate(t_fragments):
+        fragment = trip_df[trip_df.t.between(t_fragment[0], t_fragment[1])]
+        if len(fragment)<2:
+            t_fragments[i] = 0
+    t_fragments = [x for x in t_fragments if x!=0] 
+    
+    # get trip fragments
+    fragment_dfs = [np.nan]* len(t_fragments)
+    for i, t_fragment in enumerate(t_fragments):
+        fragment_df = trip_df[trip_df.t.between(t_fragment[0], t_fragment[1])].copy()
+
+        fragment_df['t_fragment'] = fragment_df.t - (fragment_df.t.iloc[0] + fragment_df.t.iloc[-1])/2#fragment_df.t - (fragment_df.t.iloc[0] + window_size/2)
+        fragment_df['relative_signal'] = fragment_df[signal_col] - fragment_df.loc[abs(fragment_df.t_fragment).idxmin(), signal_col]
+
+        fragment_dfs[i] = fragment_df
+    
+    return fragment_dfs
+
+
+def extract_baseline_fragments_alltrips(signal_col, trip_dfs, trip_names, lca_dfs, dev_nr, sections, window_size, min_dist):
+    # extract fragments for all 3 trips and dump in one list
+    baseline_fragments_alltrips = [] #for one device
+    for trip_nr in range(3):
+        trip_df, lca_df, trip_name = selector(trip_dfs, lca_dfs, trip_names, trip_nr, dev_nr, sections)
+        fragment_dfs = extract_baseline_fragments_trip(signal_col, trip_df, lca_df, window_size, min_dist)
+        baseline_fragments_alltrips.extend(fragment_dfs)
+    return baseline_fragments_alltrips
+
+
 def extract_lanechange_fragments_trip(signal_col, trip_df, lca_df, window_size):
     lca_df['t0_w'] = lca_df.t_lc-(window_size/2) # boundaries for all windows
     lca_df['t_end_w'] = lca_df.t_lc+(window_size/2)
@@ -88,9 +142,12 @@ def extract_lanechange_fragments_trip(signal_col, trip_df, lca_df, window_size):
 
         elif lca_df_row.direction == 'right':
             fragment_df = trip_df[trip_df.t.between(lca_df_row.t0_w, lca_df_row.t_end_w)].copy()
-            fragment_df['t_fragment'] = fragment_df.t - (fragment_df.t.iloc[0] + fragment_df.t.iloc[-1])/2# lca_df_row.t_lc
-            fragment_df['relative_signal'] = fragment_df[signal_col] - fragment_df.loc[abs(fragment_df.t_fragment).idxmin(), signal_col]
-            fragment_dfs[1].append(fragment_df)
+            if len(fragment_df) > 0:
+                fragment_df['t_fragment'] = fragment_df.t - (fragment_df.t.iloc[0] + fragment_df.t.iloc[-1])/2# lca_df_row.t_lc
+                fragment_df['relative_signal'] = fragment_df[signal_col] - fragment_df.loc[abs(fragment_df.t_fragment).idxmin(), signal_col]
+                fragment_dfs[1].append(fragment_df)
+            else: 
+                print('ignored_fragment')                
     return fragment_dfs
 
 
@@ -103,6 +160,23 @@ def extract_lanechange_fragments_alltrips(signal_col, trip_dfs, trip_names, lca_
         fragments_all_trips[0].extend(fragment_dfs[0])
         fragments_all_trips[1].extend(fragment_dfs[1])
     return fragments_all_trips
+
+def make_lanechange_fragments_unidirectional(fragments):
+    '''reverse the direction of the left lane changes so they can be treated as one class'''
+    fragments_left=fragments[0]
+    fragments_right = fragments[1]
+
+    fragments_positive = [np.nan]*(len(fragments_left)+len(fragments_right))
+
+    # "reverse" offset of left fragments
+    for i,fragment in enumerate(fragments_left): 
+        fragment['offset_pos'] = -fragment.offset
+        fragments_positive[i] = fragment
+    for i,fragment in enumerate(fragments_right): 
+        fragment['offset_pos'] = fragment.offset
+        fragments_positive[i+len(fragments_left)] = fragment
+
+    return fragments_positive
 
 
 def plot_fragments(fragment_dfs, plot_col, params):
@@ -127,6 +201,40 @@ def plot_fragments(fragment_dfs, plot_col, params):
     axs[1].text(-4,1.5, f"n={n_right}", size=15)
 
     plt.tight_layout() 
+
+def get_results(fragments_positive, fragments_negative, threshold):
+    
+    TP = 0
+    FP = 0
+    FN = 0
+    TN = 0
+    y_true = []
+    y_score = []
+
+    for fragment_pos in fragments_positive:
+        y_true.append(1)
+        offset_diff = fragment_pos.offset_pos.iloc[-1] - fragment_pos.offset_pos.iloc[0]
+        if offset_diff > threshold: #if positive class is assigned:
+            TP+=1
+            y_score.append(1)
+        else:
+            FN+=1
+            y_score.append(0)
+
+    for fragment_neg in fragments_negative:
+        y_true.append(0)
+        offset_diff = fragment_neg.offset.iloc[-1] - fragment_neg.offset.iloc[0]
+        if offset_diff > threshold: #if positive class is assigned:
+            FP+=1
+            y_score.append(1)
+        else:
+            TN +=1
+            y_score.append(0)
+            
+    accuracy = (TP+TN)/(TP+FP+TN+FN)
+    TPR = TP/(TP+FN)
+    FPR = FP/(FP+TN)
+    return y_true, y_score, TP, FP, TN, FN, accuracy, TPR, FPR
 
 def plot_fragments_offset(fragment_dfs, plot_col, params):
     fig, axs = plt.subplots(1,2, figsize=(8,2), sharey=True)
