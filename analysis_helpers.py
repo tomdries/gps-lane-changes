@@ -136,14 +136,14 @@ def extract_lanechange_fragments_trip(signal_col, trip_df, lca_df, window_size):
     for i, lca_df_row in lca_df.iterrows(): # for lane changes in lca_df
         if lca_df_row.direction == 'left':
             fragment_df = trip_df[trip_df.t.between(lca_df_row.t0_w, lca_df_row.t_end_w)].copy()
-            fragment_df['t_fragment'] = fragment_df.t - (fragment_df.t.iloc[0] + fragment_df.t.iloc[-1])/2 # lca_df_row.t_lc
+            fragment_df['t_fragment'] = fragment_df.t - lca_df_row.t_lc#(fragment_df.t.iloc[0] + fragment_df.t.iloc[-1])/2
             fragment_df['relative_signal'] = fragment_df[signal_col] - fragment_df.loc[abs(fragment_df.t_fragment).idxmin(), signal_col]
             fragment_dfs[0].append(fragment_df)
 
         elif lca_df_row.direction == 'right':
             fragment_df = trip_df[trip_df.t.between(lca_df_row.t0_w, lca_df_row.t_end_w)].copy()
             if len(fragment_df) > 0:
-                fragment_df['t_fragment'] = fragment_df.t - (fragment_df.t.iloc[0] + fragment_df.t.iloc[-1])/2# lca_df_row.t_lc
+                fragment_df['t_fragment'] = fragment_df.t - lca_df_row.t_lc # (fragment_df.t.iloc[0] + fragment_df.t.iloc[-1])/2# lca_df_row.t_lc
                 fragment_df['relative_signal'] = fragment_df[signal_col] - fragment_df.loc[abs(fragment_df.t_fragment).idxmin(), signal_col]
                 fragment_dfs[1].append(fragment_df)
             else: 
@@ -161,7 +161,7 @@ def extract_lanechange_fragments_alltrips(signal_col, trip_dfs, trip_names, lca_
         fragments_all_trips[1].extend(fragment_dfs[1])
     return fragments_all_trips
 
-def make_lanechange_fragments_unidirectional(fragments):
+def make_lanechange_fragments_unidirectional(fragments, signal_col):
     '''reverse the direction of the left lane changes so they can be treated as one class'''
     fragments_left=fragments[0]
     fragments_right = fragments[1]
@@ -170,10 +170,10 @@ def make_lanechange_fragments_unidirectional(fragments):
 
     # "reverse" offset of left fragments
     for i,fragment in enumerate(fragments_left): 
-        fragment['offset_pos'] = -fragment.offset
+        fragment['offset_pos'] = -fragment[signal_col]
         fragments_positive[i] = fragment
     for i,fragment in enumerate(fragments_right): 
-        fragment['offset_pos'] = fragment.offset
+        fragment['offset_pos'] = fragment[signal_col]
         fragments_positive[i+len(fragments_left)] = fragment
 
     return fragments_positive
