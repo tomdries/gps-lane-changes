@@ -1,4 +1,4 @@
-Code and partial data repository of the [AHFE 2022 paper]( https://www.researchgate.net/publication/358621757_Identifying_lane_changes_automatically_using_the_GPS_sensors_of_portable_devices) *Identifying lane changes automatically using the GPS sensors of portable devices.* by Tom Driessen, Lokin Prasad, Pavlo Bazilinskyy, and Joost de Winter
+Code and partial data repository of the [AHFE 2022 paper]( https://www.researchgate.net/publication/358621757_Identifying_lane_changes_automatically_using_the_GPS_sensors_of_portable_devices) *Identifying lane changes automatically using the GPS sensors of portable devices* by Tom Driessen, Lokin Prasad, Pavlo Bazilinskyy, and Joost de Winter
 
 All tabular data is stored in the current repository. Video recordings can be found in the [4TU research repository](https://doi.org/10.4121/19170302). 
 
