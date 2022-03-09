@@ -14,8 +14,6 @@ def derivative(t, y):
     dt =    np.where(dt==0, np.nan, dt)
     dydt = dy/dt
 
- 
-    
     return dydt
 
 def selector(trip_dfs, lca_dfs, trip_names, trip_nr, device_nr, sections = 'all', road_type = 'all'):
@@ -307,3 +305,9 @@ def precision_recall_f1(TP, FN, FP):
     return precision, recall, f1
 
 
+def round_sort_cols(df):
+    df.accuracy =df.accuracy.astype(float).round(3)
+    df.TPR = df.TPR.astype(float).round(3)
+    df.FPR = df.FPR.astype(float).round(3)
+    return df[['device', 'sections', 'window_size', 'threshold','accuracy', 'TP', 'FP', 'TN',
+       'FN', 'TPR', 'FPR']]
