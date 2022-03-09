@@ -11,6 +11,4 @@ See `/data`, which contains
 3. The matched trajectories for each ride, representing the roads geometry. These were matched using [Mapbox Map Matching API](https://docs.mapbox.com/help/glossary/map-matching-api/). 
 
 # Code
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/tomdries/gps-lane-changes/blob/main/analysis.ipynb)
-
-The analysis can be found in analysis.ipynb and can be opened in google Colab.
+The analysis can be found in analysis.ipynb
